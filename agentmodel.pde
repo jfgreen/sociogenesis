@@ -6,16 +6,17 @@ class AgentModel {
   Collection<Agent> agents;
   Collection<Pellet> pellets;
 
-  AgentModel(int agentCount) {
+  AgentModel(int agentCount, int pelletCount) {
     agents = new ArrayList();
     for(int i = 0; i < agentCount; i++) {
       PVector initalPositon = new PVector(random(width), random(height));
       float initalDirection = random(0, TWO_PI);
-      agents.add(new Agent(initalPositon, initalDirection));
+      Brain brain = new Brain();
+      agents.add(new Agent(initalPositon, initalDirection, brain));
     }
 
     pellets = new ArrayList();
-    for(int i = 0; i < 25; i++) {
+    for(int i = 0; i < pelletCount; i++) {
       PVector initalPositon = new PVector(random(width), random(height));
       pellets.add(new Pellet(initalPositon));
     }

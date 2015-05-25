@@ -1,31 +1,27 @@
-
-
 class Agent {
 
-  float SIZE = 8;
+  float SIZE = 5;
   color STROKE_COL = color(220, 220, 220);
-  color FILL_COL = color(200, 200, 0);
+  color FILL_COL = color(200, 200, 0, 100);
 
   float VELOCITY = 3;
   float MAX_TURN = 0.3;
   float PERCEPTION = 25;
 
   PVector position; // Postion in the world space
-  float direction;  // Direction the agent is facing
+  float direction; // Direction the agent is facing
 
-  Pellet heldPellet;
+  Brain brain;  // Brain for deciding when to pick up and put down pellets.
+  Pellet heldPellet; // Currently held pellet. Null when none is held.
 
-  Agent(PVector position, float direction) {
+  Agent(PVector position, float direction, Brain brain) {
     this.position = position;
     this.direction = direction;
+    this.brain = brain;
   }
 
   void update(Collection<Pellet> pellets) {
-    if (heldPellet == null) {
-      considerPickingUp(pellets);
-    } else {
-      considerPuttingDown();
-    }
+    think(pellets);
     move();
   }
 
@@ -51,34 +47,34 @@ class Agent {
     direction += map(randomGaussian(), -1, 1, -MAX_TURN, MAX_TURN);
 
     if (heldPellet != null) {
-      heldPellet.setPosition(position);
+      heldPellet.position.set(position);
     }
   }
 
-  void considerPickingUp(Collection<Pellet> pellets) {
-    Pellet availablePellet = findAvailablePellet(pellets);
-    if (availablePellet != null && random(0, 1) > 0.8) {
-      availablePellet.claim();
-      heldPellet = availablePellet;
+  void think(Collection<Pellet> pellets) {
+    if (heldPellet == null) {
+      Pellet availablePellet = findAvailablePellet(pellets);
+      if (availablePellet != null && brain.shouldTake(availablePellet, pellets)) {
+        availablePellet.claimed = true;
+        heldPellet = availablePellet;
+      }
+    } else {
+      if (brain.shouldPlace(heldPellet, pellets)) {
+        heldPellet.claimed = false;
+        heldPellet = null;
+      }
     }
   }
 
   Pellet findAvailablePellet(Collection<Pellet> pellets) {
     // Return the closest pellet that is in range and not already claimed.
     for(Pellet pellet : pellets) {
-      float distance = pellet.getPosition().dist(position);
-      if (distance < PERCEPTION && !pellet.isClaimed()) {
+      float distance = pellet.position.dist(position);
+      if (distance < PERCEPTION && !pellet.claimed) {
         return pellet;
       }
     }
     return null;
   }
-
-  void considerPuttingDown() {
-    if (heldPellet != null && random(0, 1) > 0.95) {
-      heldPellet.abandon();
-      heldPellet = null;
-    }
-  } 
 
 }
