@@ -4,8 +4,8 @@ import java.util.ArrayList;
 class Brain {
 
   float NEIGHBOURHOOD = 25;
-  float kP = 0.1; // Tunes the probability of placing. Lower is more likely.
-  float kT = 0.1; // Tunes the probability of taling. Higher is more likely.
+  float kP = 2; // Tunes the probability of placing. Lower is more likely.
+  float kT = 2; // Tunes the probability of taking. Higher is more likely.
 
   Brain() {
 

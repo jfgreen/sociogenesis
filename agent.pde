@@ -1,28 +1,33 @@
 class Agent {
 
-  float SIZE = 5;
+  float SIZE = 4;
   color STROKE_COL = color(220, 220, 220);
   color FILL_COL = color(200, 200, 0, 100);
 
-  float VELOCITY = 3;
-  float MAX_TURN = 0.3;
-  float PERCEPTION = 25;
+  float VELOCITY = 3;   // Distance an agent travels at each step.
+  float MAX_TURN = 0.3; // Maximum angle (in radians) an agent can turn in one step.
+  float REACH = 25;     // Radius of agents reach. Pellets must be within to be picked up.
+  int THINK_STEP = 10;  // Number of steps in between each call to think.
 
-  PVector position; // Postion in the world space
-  float direction; // Direction the agent is facing
-
-  Brain brain;  // Brain for deciding when to pick up and put down pellets.
-  Pellet heldPellet; // Currently held pellet. Null when none is held.
+  PVector position;     // Postion in the world space
+  float direction;      // Direction the agent is facing
+  Brain brain;          // Brain for deciding when to pick up and put down pellets.
+  Pellet heldPellet;    // Currently held pellet. Null when none is held.
+  int stepsTaken;       // Used to keep track of the number of steps taken.
 
   Agent(PVector position, float direction, Brain brain) {
     this.position = position;
     this.direction = direction;
     this.brain = brain;
+    this.stepsTaken = 0;
   }
 
   void update(Collection<Pellet> pellets) {
-    think(pellets);
+    if (stepsTaken % THINK_STEP == 0) {
+      think(pellets);
+    }
     move();
+    stepsTaken++;
   }
 
   void draw() {
@@ -70,7 +75,7 @@ class Agent {
     // Return the closest pellet that is in range and not already claimed.
     for(Pellet pellet : pellets) {
       float distance = pellet.position.dist(position);
-      if (distance < PERCEPTION && !pellet.claimed) {
+      if (distance < REACH && !pellet.claimed) {
         return pellet;
       }
     }
