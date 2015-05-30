@@ -8,7 +8,7 @@ void setup() {
   controls = new ControlSet(10, height-40);
   controls.addControl(new ControlButton(0, 0, "Reset", new ButtonListener() {
     public void activate() {
-      println("foo");
+      model = new AgentModel(100, 100);
     } 
   }));
 }
