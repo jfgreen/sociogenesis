@@ -7,12 +7,14 @@ class ControlSet {
   int y;
   Collection<Control> controls;
   Control focusedControl;
+  PFont defaultFont;
 
   ControlSet(int x, int y) {
     this.x = x;
     this.y = y;
     this.controls = new ArrayList();
     this.focusedControl = null;
+    this.defaultFont = createFont("Monospaced", 12);
   }
 
   void addControl(Control control) {
@@ -72,8 +74,11 @@ class ControlSet {
   void draw() {
     pushMatrix();
     translate(x, y);
+    textFont(this.defaultFont);
     for(Control control : controls) {
+      pushStyle();
       control.draw();
+      popStyle();
     }
     popMatrix();
   }
@@ -114,6 +119,7 @@ interface ButtonListener {
 
 class ControlButton extends Control {
 
+  color LABEL_COL = color(255);
   color STROKE_COL = color(220, 220, 220, 100);
   color FILL_COL_NORMAL = color(10, 100, 230, 255);
   color FILL_COL_HOVER = color(10, 120, 250, 255);
@@ -121,15 +127,17 @@ class ControlButton extends Control {
 
   color currentCol;
   ButtonListener listener;
+  String label;
 
-  ControlButton(int x, int y, int buttonWidth, int buttonHeight, ButtonListener listener) {
+  ControlButton(int x, int y, int buttonWidth, int buttonHeight, String label, ButtonListener listener) {
     super(x, y, buttonWidth, buttonHeight);
     this.currentCol = FILL_COL_NORMAL;
+    this.label = label;
     this.listener = listener;
   }
 
-  ControlButton(int x, int y, ButtonListener listener) {
-    this(x, y, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, listener);
+  ControlButton(int x, int y, String label, ButtonListener listener) {
+    this(x, y, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, label, listener);
   }
 
   void handleMouseMoved(int lx, int ly) {
@@ -154,5 +162,8 @@ class ControlButton extends Control {
     stroke(STROKE_COL);
     fill(currentCol);
     rect(x, y, controlWidth, controlHeight); 
+    fill(LABEL_COL);
+    textAlign(CENTER, CENTER);
+    text(label, x + controlWidth/2, y + controlHeight/2);
   }
 }
