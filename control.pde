@@ -77,8 +77,10 @@ class ControlSet {
     textFont(this.defaultFont);
     for(Control control : controls) {
       pushStyle();
+      pushMatrix();
       control.draw();
       popStyle();
+      popMatrix();
     }
     popMatrix();
   }
@@ -89,6 +91,12 @@ abstract class Control {
   int y;
   int controlWidth;
   int controlHeight;
+
+  color LABEL_COL = color(255);
+  color STROKE_COL = color(220, 220, 220, 100);
+  color FILL_COL_NORMAL = color(10, 100, 230, 255);
+  color FILL_COL_HOVER = color(10, 120, 250, 255);
+  color FILL_COL_DOWN = color(10, 90, 200, 255);
 
   Control(int x, int y, int controlWidth, int controlHeight) {
     this.x = x;
@@ -110,20 +118,14 @@ abstract class Control {
   abstract void draw();
 }
 
-static int DEFAULT_BUTTON_WIDTH = 48;
-static int DEFAULT_BUTTON_HEIGHT = 30;
-
 interface ButtonListener {
   abstract void activate();
 }
 
-class ControlButton extends Control {
+static int DEFAULT_BUTTON_WIDTH = 48;
+static int DEFAULT_BUTTON_HEIGHT = 30;
 
-  color LABEL_COL = color(255);
-  color STROKE_COL = color(220, 220, 220, 100);
-  color FILL_COL_NORMAL = color(10, 100, 230, 255);
-  color FILL_COL_HOVER = color(10, 120, 250, 255);
-  color FILL_COL_DOWN = color(10, 90, 200, 255);
+class ControlButton extends Control {
 
   color currentCol;
   ButtonListener listener;
@@ -165,5 +167,41 @@ class ControlButton extends Control {
     fill(LABEL_COL);
     textAlign(CENTER, CENTER);
     text(label, x + controlWidth/2, y + controlHeight/2);
+  }
+}
+
+static int DEFAULT_SLIDER_WIDTH = 100;
+static int SLIDER_HEIGHT = 40;
+static int SLIDER_HANDLE_SIZE = 12;
+
+class ControlSlider extends Control {
+
+  int handlePosition; 
+
+  ControlSlider(int x, int y, int sliderWidth, String label) {
+    super(x, y, sliderWidth, SLIDER_HEIGHT);
+    this.handlePosition = 0;
+  }
+
+  ControlSlider(int x, int y, String label) {
+    this(x, y, DEFAULT_SLIDER_WIDTH, label);
+  }
+
+  void handleMouseMoved(int lx, int ly) {
+    if (lx < x) {
+      handlePosition = 0;
+    } else if (lx > x + controlWidth) {
+      handlePosition = controlWidth;
+    } else {
+      handlePosition = lx-x;
+    }
+  }
+
+  void draw() {
+    stroke(STROKE_COL);
+    fill(FILL_COL_NORMAL);
+    translate(x, y +this.controlHeight/2);
+    line(0,0,this.controlWidth, 0);
+    ellipse(handlePosition, 0, SLIDER_HANDLE_SIZE, SLIDER_HANDLE_SIZE);
   }
 }

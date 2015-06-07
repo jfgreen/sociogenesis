@@ -5,12 +5,13 @@ void setup() {
 
   size(800, 800);
   model = new AgentModel(100, 100);
-  controls = new ControlSet(10, height-40);
+  controls = new ControlSet(10, height-200);
   controls.addControl(new ControlButton(0, 0, "Reset", new ButtonListener() {
     public void activate() {
       model = new AgentModel(100, 100);
     } 
   }));
+  controls.addControl(new ControlSlider(100, 50, "Foo"));
 }
 
 void draw() {
