@@ -11,7 +11,11 @@ void setup() {
       model = new AgentModel(100, 100);
     } 
   }));
-  controls.addControl(new ControlSlider(100, 50, 5, 7, "Foo"));
+  controls.addControl(new ControlSlider(100, 50, 5, 7, "Foo", new SliderListener() {
+    public void activate(float val) {
+      println(val);
+    }
+  }));
 }
 
 void draw() {

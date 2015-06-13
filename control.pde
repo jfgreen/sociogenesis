@@ -186,6 +186,10 @@ static int DEFAULT_SLIDER_WIDTH = 100;
 static int SLIDER_HEIGHT = 40;
 static int SLIDER_HANDLE_SIZE = 12;
 
+interface SliderListener {
+  abstract void activate(float val);
+}
+
 class ControlSlider extends Control {
 
   int handlePosition; 
@@ -193,18 +197,20 @@ class ControlSlider extends Control {
   float maxVal;
   float val;
   String label;
+  SliderListener listener;
 
-  ControlSlider(int x, int y, int sliderWidth, float minVal, float maxVal, String label) {
+  ControlSlider(int x, int y, int sliderWidth, float minVal, float maxVal, String label, SliderListener listener) {
     super(x, y, sliderWidth, SLIDER_HEIGHT);
     this.handlePosition = 0;
     this.val = minVal;
     this.label = label;
     this.minVal = minVal;
     this.maxVal = maxVal;
+    this.listener = listener;
   }
 
-  ControlSlider(int x, int y, float minVal, float maxVal, String label) {
-    this(x, y, DEFAULT_SLIDER_WIDTH, minVal, maxVal, label);
+  ControlSlider(int x, int y, float minVal, float maxVal, String label, SliderListener listener) {
+    this(x, y, DEFAULT_SLIDER_WIDTH, minVal, maxVal, label, listener);
   }
 
   void moveHandle(int lx, int ly) {
@@ -216,6 +222,7 @@ class ControlSlider extends Control {
       handlePosition = lx-x;
     }
     val = map(handlePosition, 0, controlWidth, minVal, maxVal);
+    listener.activate(val);
   }
 
   //TODO: Make handle highlightable like button is.
