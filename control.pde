@@ -1,7 +1,7 @@
 import java.util.Collection;
 import java.util.ArrayList;
 
-//TODO: Refactor this somewhat
+//TODO: Refactor this somewhat. Maybe controlset can do more heavy lifting. Simpler hooks for the controls?
 
 class ControlSet {
 
@@ -189,14 +189,22 @@ static int SLIDER_HANDLE_SIZE = 12;
 class ControlSlider extends Control {
 
   int handlePosition; 
+  float minVal;
+  float maxVal;
+  float val;
+  String label;
 
-  ControlSlider(int x, int y, int sliderWidth, String label) {
+  ControlSlider(int x, int y, int sliderWidth, float minVal, float maxVal, String label) {
     super(x, y, sliderWidth, SLIDER_HEIGHT);
     this.handlePosition = 0;
+    this.val = minVal;
+    this.label = label;
+    this.minVal = minVal;
+    this.maxVal = maxVal;
   }
 
-  ControlSlider(int x, int y, String label) {
-    this(x, y, DEFAULT_SLIDER_WIDTH, label);
+  ControlSlider(int x, int y, float minVal, float maxVal, String label) {
+    this(x, y, DEFAULT_SLIDER_WIDTH, minVal, maxVal, label);
   }
 
   void moveHandle(int lx, int ly) {
@@ -207,6 +215,7 @@ class ControlSlider extends Control {
     } else {
       handlePosition = lx-x;
     }
+    val = map(handlePosition, 0, controlWidth, minVal, maxVal);
   }
 
   //TODO: Make handle highlightable like button is.
@@ -230,5 +239,10 @@ class ControlSlider extends Control {
     translate(x, y +this.controlHeight/2);
     line(0,0,this.controlWidth, 0);
     ellipse(handlePosition, 0, SLIDER_HANDLE_SIZE, SLIDER_HANDLE_SIZE);
+    textAlign(RIGHT, CENTER);
+    fill(255);
+    text(label + ":", -12, -2);
+    textAlign(LEFT, CENTER);
+    text(val, controlWidth + 12, -2);
   }
 }
