@@ -32,3 +32,7 @@ void mouseReleased() {
 void mouseMoved() {
   controls.handleMouseMoved(mouseX, mouseY);
 }
+
+void mouseDragged() {
+  controls.handleMouseDragged(mouseX, mouseY);
+}

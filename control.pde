@@ -1,6 +1,8 @@
 import java.util.Collection;
 import java.util.ArrayList;
 
+//TODO: Refactor this somewhat
+
 class ControlSet {
 
   int x;
@@ -71,6 +73,15 @@ class ControlSet {
     }
   }
 
+  void handleMouseDragged(int mx, int my) {
+    int localMx = toLocalX(mx);
+    int localMy = toLocalY(my);
+
+    if (focusedControl != null) {
+      focusedControl.handleMouseDragged(localMx, localMy);
+    }
+  }
+
   void draw() {
     pushMatrix();
     translate(x, y);
@@ -115,6 +126,7 @@ abstract class Control {
   void handleMousePressed(int lx, int ly) {}
   void handleMouseReleased(int lx, int ly) {}
   void handleMouseMoved(int lx, int ly) {}
+  void handleMouseDragged(int lx, int ly) {}
   abstract void draw();
 }
 
@@ -187,7 +199,7 @@ class ControlSlider extends Control {
     this(x, y, DEFAULT_SLIDER_WIDTH, label);
   }
 
-  void handleMouseMoved(int lx, int ly) {
+  void moveHandle(int lx, int ly) {
     if (lx < x) {
       handlePosition = 0;
     } else if (lx > x + controlWidth) {
@@ -195,6 +207,21 @@ class ControlSlider extends Control {
     } else {
       handlePosition = lx-x;
     }
+  }
+
+  //TODO: Make handle highlightable like button is.
+
+  void handleMousePressed(int lx, int ly) {
+    moveHandle(lx, ly);
+  }
+
+  void handleMouseDragged(int lx, int ly) {
+    moveHandle(lx, ly);
+  }
+
+
+  boolean isOnHandle(int lx, int ly) {
+    return dist(x + handlePosition, y +this.controlHeight/2, lx, ly) < SLIDER_HANDLE_SIZE;
   }
 
   void draw() {
