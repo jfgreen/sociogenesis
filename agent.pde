@@ -15,16 +15,21 @@ class Agent {
   Pellet heldPellet;    // Currently held pellet. Null when none is held.
   int stepsTaken;       // Used to keep track of the number of steps taken.
 
-  Agent(PVector position, float direction, Brain brain) {
+  Environment environment;
+  Parameters parameters;
+
+  Agent(PVector position, float direction, Brain brain, Environment environment, Parameters parameters) {
     this.position = position;
     this.direction = direction;
     this.brain = brain;
     this.stepsTaken = 0;
+    this.environment = environment;
+    this.parameters = parameters;
   }
 
-  void update(Collection<Pellet> pellets) {
+  void update() {
     if (stepsTaken % THINK_STEP == 0) {
-      think(pellets);
+      think();
     }
     move();
     stepsTaken++;
@@ -56,15 +61,15 @@ class Agent {
     }
   }
 
-  void think(Collection<Pellet> pellets) {
+  void think() {
     if (heldPellet == null) {
-      Pellet availablePellet = findAvailablePellet(pellets);
-      if (availablePellet != null && brain.shouldTake(availablePellet, pellets)) {
+      Pellet availablePellet = findAvailablePellet(environment.pellets);
+      if (availablePellet != null && brain.shouldTake(availablePellet, environment.pellets)) {
         availablePellet.claimed = true;
         heldPellet = availablePellet;
       }
     } else {
-      if (brain.shouldPlace(heldPellet, pellets)) {
+      if (brain.shouldPlace(heldPellet, environment.pellets)) {
         heldPellet.claimed = false;
         heldPellet = null;
       }
