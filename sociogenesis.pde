@@ -1,5 +1,5 @@
 AgentModel model;
-ControlSet controls;
+ControlSet controlSet;
 Parameters parameters;
 
 void setup() {
@@ -8,17 +8,19 @@ void setup() {
   //TODO: How to make the control data binding a 2 way thing?
 
   model = new AgentModel(parameters);
-  //controls = new ControlSet(10, height-50);
-  controlSet.addControl(new ControlButton(260, 0, "Reset", new ButtonListener() {
+  controlSet = new ControlSet();
+  ControlGroup group = new ControlGroup(0, height-40);
+  group.addControl(new ControlButton(260, 0, "Reset", new ButtonListener() {
     public void activate() {
       model = new AgentModel(parameters);
     } 
   }));
-  controlSet.addControl(new ControlSlider(70, 0, 0, 100, parameters.agentCount, "Agents", new SliderListener() {
+  group.addControl(new ControlSlider(70, 0, 0, 100, parameters.agentCount, "Agents", new SliderListener() {
     public void activate(float val) {
       parameters.agentCount = (int) val;
     }
   }));
+  controlSet.add(group);
 }
 
 
@@ -29,20 +31,3 @@ void draw() {
   controlSet.draw();
 }
 
-/**
-void mousePressed() {
-  controls.handleMousePressed(mouseX, mouseY);
-}
-
-void mouseReleased() {
-  controls.handleMouseReleased(mouseX, mouseY);
-}
-
-void mouseMoved() {
-  controls.handleMouseMoved(mouseX, mouseY);
-}
-
-void mouseDragged() {
-  controls.handleMouseDragged(mouseX, mouseY);
-}
-**/

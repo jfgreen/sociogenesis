@@ -3,106 +3,96 @@ import java.util.ArrayList;
 
 //TODO: Refactor this somewhat. Maybe controlset can do more heavy lifting. Simpler hooks for the controls?
 
-ControlSet controlSet = new ControlSet(0,0);
+ControlSet activeControlSet;
 
 void mousePressed() {
-  controlSet.handleMousePressed(mouseX, mouseY);
+  if (activeControlSet != null) {
+    activeControlSet.handleMousePressed(mouseX, mouseY);
+  }
 }
 
 void mouseReleased() {
-  controlSet.handleMouseReleased(mouseX, mouseY);
+  if (activeControlSet != null) {
+    activeControlSet.handleMouseReleased(mouseX, mouseY);
+  }
 }
 
 void mouseMoved() {
-  controlSet.handleMouseMoved(mouseX, mouseY);
+  if (activeControlSet != null) {
+    activeControlSet.handleMouseMoved(mouseX, mouseY);
+  }
 }
 
 void mouseDragged() {
-  controlSet.handleMouseDragged(mouseX, mouseY);
+  if (activeControlSet != null) {
+    activeControlSet.handleMouseDragged(mouseX, mouseY);
+  }
 }
 
 class ControlSet {
 
-  int x;
-  int y;
   Collection<Control> controls;
   Control focusedControl;
   PFont defaultFont;
 
-  ControlSet(int x, int y) {
-    this.x = x;
-    this.y = y;
+  ControlSet() {
     this.controls = new ArrayList();
-    this.focusedControl = null;
     this.defaultFont = createFont("Monospaced", 12);
+    activeControlSet = this;
   }
 
-  void addControl(Control control) {
+  void add(Control control) {
     controls.add(control);
   }
 
-  Control getControlAt(int localMx, int localMy) {
+  void add(ControlGroup group) {
+    for (Control control : group.controls) {
+      control.x += group.x;
+      control.y += group.y;
+      controls.add(control);
+    }
+  }
+
+  Control getControlAt(int x, int y) {
     for(Control control : controls) {
-      if (control.encompassesPoint(localMx, localMy)) {
+      if (control.encompassesPoint(x, y)) {
         return control;
       }
     }
     return null;
   }
 
-  int toLocalX(int mx) {
-    return mx - x;
-  }
-
-  int toLocalY(int my) {
-    return my - y;
-  }
-
   void handleMousePressed(int mx, int my) {
-    int localMx = toLocalX(mx);
-    int localMy = toLocalY(my);
-
-    focusedControl = getControlAt(localMx, localMy);
+    focusedControl = getControlAt(mx, my);
     if (focusedControl != null) {
-      focusedControl.handleMousePressed(localMx, localMy);
+      focusedControl.handleMousePressed(mx, my);
     }
   }
 
   void handleMouseReleased(int mx, int my) {
-    int localMx = toLocalX(mx);
-    int localMy = toLocalY(my);
-
     if (focusedControl != null) {
-      focusedControl.handleMouseReleased(localMx, localMy);
+      focusedControl.handleMouseReleased(mx, my);
       focusedControl = null;
     }
   }
 
   void handleMouseMoved(int mx, int my) {
-    int localMx = toLocalX(mx);
-    int localMy = toLocalY(my);
-
     if (focusedControl != null) {
-      focusedControl.handleMouseMoved(localMx, localMy);
+      focusedControl.handleMouseMoved(mx, my);
     } else {
       for(Control control : controls) {
-        control.handleMouseMoved(localMx, localMy);
+        control.handleMouseMoved(mx, my);
       }
     }
   }
 
   void handleMouseDragged(int mx, int my) {
-    int localMx = toLocalX(mx);
-    int localMy = toLocalY(my);
-
     if (focusedControl != null) {
-      focusedControl.handleMouseDragged(localMx, localMy);
+      focusedControl.handleMouseDragged(mx, my);
     }
   }
 
   void draw() {
-    pushMatrix();
-    translate(x, y);
     textFont(this.defaultFont);
     for(Control control : controls) {
       pushStyle();
@@ -111,8 +101,24 @@ class ControlSet {
       popStyle();
       popMatrix();
     }
-    popMatrix();
   }
+}
+
+class ControlGroup {
+  int x; 
+  int y;
+  Collection<Control> controls;
+
+  ControlGroup(int x, int y) {
+    this.x = x;
+    this.y = y;
+    controls = new ArrayList();
+  }
+
+  void addControl(Control control) {
+    controls.add(control);
+  }
+
 }
 
 abstract class Control {
@@ -134,17 +140,17 @@ abstract class Control {
     this.controlHeight = controlHeight;
   }
 
-  boolean encompassesPoint(int lx, int ly) {
-    return (lx > x &&
-            lx < x + controlWidth &&
-            ly > y &&
-            ly < y + controlHeight);
+  boolean encompassesPoint(int px, int py) {
+    return (px > x &&
+            px < x + controlWidth &&
+            py > y &&
+            py < y + controlHeight);
   }
 
-  void handleMousePressed(int lx, int ly) {}
-  void handleMouseReleased(int lx, int ly) {}
-  void handleMouseMoved(int lx, int ly) {}
-  void handleMouseDragged(int lx, int ly) {}
+  void handleMousePressed(int mx, int my) {}
+  void handleMouseReleased(int mx, int my) {}
+  void handleMouseMoved(int mx, int my) {}
+  void handleMouseDragged(int mx, int my) {}
   abstract void draw();
 }
 
