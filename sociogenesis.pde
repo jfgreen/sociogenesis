@@ -5,17 +5,18 @@ Parameters parameters;
 void setup() {
   size(800, 800);
   parameters = new Parameters();
+  //TODO: How to make the control data binding a 2 way thing?
 
   model = new AgentModel(parameters);
-  controls = new ControlSet(10, height-200);
-  controls.addControl(new ControlButton(0, 0, "Reset", new ButtonListener() {
+  //controls = new ControlSet(10, height-50);
+  controlSet.addControl(new ControlButton(260, 0, "Reset", new ButtonListener() {
     public void activate() {
       model = new AgentModel(parameters);
     } 
   }));
-  controls.addControl(new ControlSlider(100, 50, 5, 7, "Foo", new SliderListener() {
+  controlSet.addControl(new ControlSlider(70, 0, 0, 100, parameters.agentCount, "Agents", new SliderListener() {
     public void activate(float val) {
-      println(val);
+      parameters.agentCount = (int) val;
     }
   }));
 }
@@ -25,9 +26,10 @@ void draw() {
   background(color(10,10,10));
   model.update();
   model.draw();
-  controls.draw();
+  controlSet.draw();
 }
 
+/**
 void mousePressed() {
   controls.handleMousePressed(mouseX, mouseY);
 }
@@ -43,3 +45,4 @@ void mouseMoved() {
 void mouseDragged() {
   controls.handleMouseDragged(mouseX, mouseY);
 }
+**/

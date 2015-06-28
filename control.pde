@@ -3,6 +3,24 @@ import java.util.ArrayList;
 
 //TODO: Refactor this somewhat. Maybe controlset can do more heavy lifting. Simpler hooks for the controls?
 
+ControlSet controlSet = new ControlSet(0,0);
+
+void mousePressed() {
+  controlSet.handleMousePressed(mouseX, mouseY);
+}
+
+void mouseReleased() {
+  controlSet.handleMouseReleased(mouseX, mouseY);
+}
+
+void mouseMoved() {
+  controlSet.handleMouseMoved(mouseX, mouseY);
+}
+
+void mouseDragged() {
+  controlSet.handleMouseDragged(mouseX, mouseY);
+}
+
 class ControlSet {
 
   int x;
@@ -199,18 +217,20 @@ class ControlSlider extends Control {
   String label;
   SliderListener listener;
 
-  ControlSlider(int x, int y, int sliderWidth, float minVal, float maxVal, String label, SliderListener listener) {
+  //TODO: How can we account for whole numbers?
+
+  ControlSlider(int x, int y, int sliderWidth, float minVal, float maxVal, float initVal, String label, SliderListener listener) {
     super(x, y, sliderWidth, SLIDER_HEIGHT);
     this.handlePosition = 0;
-    this.val = minVal;
     this.label = label;
     this.minVal = minVal;
     this.maxVal = maxVal;
+    this.val = initVal;
     this.listener = listener;
   }
 
-  ControlSlider(int x, int y, float minVal, float maxVal, String label, SliderListener listener) {
-    this(x, y, DEFAULT_SLIDER_WIDTH, minVal, maxVal, label, listener);
+  ControlSlider(int x, int y, float minVal, float maxVal, float initVal, String label, SliderListener listener) {
+    this(x, y, DEFAULT_SLIDER_WIDTH, minVal, maxVal, initVal, label, listener);
   }
 
   void moveHandle(int lx, int ly) {
