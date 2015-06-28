@@ -11,17 +11,15 @@ class Agent {
 
   PVector position;     // Postion in the world space
   float direction;      // Direction the agent is facing
-  Brain brain;          // Brain for deciding when to pick up and put down pellets.
   Pellet heldPellet;    // Currently held pellet. Null when none is held.
   int stepsTaken;       // Used to keep track of the number of steps taken.
 
   Environment environment;
   Parameters parameters;
 
-  Agent(PVector position, float direction, Brain brain, Environment environment, Parameters parameters) {
+  Agent(PVector position, float direction, Environment environment, Parameters parameters) {
     this.position = position;
     this.direction = direction;
-    this.brain = brain;
     this.stepsTaken = 0;
     this.environment = environment;
     this.parameters = parameters;
@@ -64,12 +62,12 @@ class Agent {
   void think() {
     if (heldPellet == null) {
       Pellet availablePellet = findAvailablePellet(environment.pellets);
-      if (availablePellet != null && brain.shouldTake(availablePellet, environment.pellets)) {
+      if (availablePellet != null && shouldTake(availablePellet, environment.pellets)) {
         availablePellet.claimed = true;
         heldPellet = availablePellet;
       }
     } else {
-      if (brain.shouldPlace(heldPellet, environment.pellets)) {
+      if (shouldPlace(heldPellet, environment.pellets)) {
         heldPellet.claimed = false;
         heldPellet = null;
       }
@@ -85,6 +83,30 @@ class Agent {
       }
     }
     return null;
+  }
+
+    boolean shouldPlace(Pellet pellet, Collection<Pellet> allPellets) {
+    float f = float(getNeighbourhood(pellet, allPellets, parameters.neighbourThreshold).size());
+    float kP = parameters.kPlace;
+    float probability = pow(f/(f+kP), 2);
+    return random(0, 1) < probability;
+  }
+
+  boolean shouldTake(Pellet pellet, Collection<Pellet> allPellets) {
+    float f = float(getNeighbourhood(pellet, allPellets, parameters.neighbourThreshold).size());
+    float kT = parameters.kTake;
+    float probability = pow(kT/(f+kT), 2);
+    return random(0, 1) < probability;
+  }
+
+  Collection<Pellet> getNeighbourhood(Pellet pellet, Collection<Pellet> allPellets, float threshold) {
+    ArrayList<Pellet> neighbours = new ArrayList();
+    for (Pellet otherPellet : allPellets) {
+      if (pellet.position.dist(otherPellet.position) < threshold && otherPellet != pellet) {
+        neighbours.add(otherPellet);
+      }
+    }
+    return neighbours;
   }
 
 }

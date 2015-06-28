@@ -115,7 +115,7 @@ class ControlGroup {
     controls = new ArrayList();
   }
 
-  void addControl(Control control) {
+  void add(Control control) {
     controls.add(control);
   }
 
@@ -216,7 +216,7 @@ interface SliderListener {
 
 class ControlSlider extends Control {
 
-  int handlePosition; 
+  float handlePosition; 
   float minVal;
   float maxVal;
   float val;
@@ -227,7 +227,7 @@ class ControlSlider extends Control {
 
   ControlSlider(int x, int y, int sliderWidth, float minVal, float maxVal, float initVal, String label, SliderListener listener) {
     super(x, y, sliderWidth, SLIDER_HEIGHT);
-    this.handlePosition = 0;
+    this.handlePosition = map(initVal, minVal, maxVal, 0, controlWidth);
     this.label = label;
     this.minVal = minVal;
     this.maxVal = maxVal;

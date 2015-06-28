@@ -14,8 +14,7 @@ class AgentModel {
     for(int i = 0; i < parameters.agentCount; i++) {
       PVector initalPositon = new PVector(random(width), random(height));
       float initalDirection = random(0, TWO_PI);
-      Brain brain = new Brain();
-      agents.add(new Agent(initalPositon, initalDirection, brain, environment, parameters));
+      agents.add(new Agent(initalPositon, initalDirection, environment, parameters));
     }
 
     for(int i = 0; i < parameters.pelletCount; i++) {
