@@ -30,6 +30,7 @@ class AgentModel {
   }
 
   void draw() {
+    background(color(10,10,10));
     for(Agent agent : environment.agents) {
       agent.draw();
     }
